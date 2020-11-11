@@ -68,6 +68,7 @@
                                         </div>
                                         <div class="form-group">
                                              @Html.DropDownList("Input.Role", new SelectList(Model.Input.rolesLista, "Text", "Text"), "Seleccione un role", new { @class = "form-control" })
+                                            <span asp-validation-for="Input.Role" class="text-danger"></span>
                                         </div>
                                         <div class="form-group">
                                             <button type="submit" class="btn btn-primary btn-block">Register</button>
@@ -85,3 +86,6 @@
         </div>
     </form>
 </div>
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+ }

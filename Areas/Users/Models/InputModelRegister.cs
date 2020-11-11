@@ -19,7 +19,7 @@ namespace SalesSystem.Areas.Users.Models
 
         [Required(ErrorMessage = "El campo telefono es obligatorio.")]
         [DataType(DataType.PhoneNumber)]
-        [RegularExpression(@"^\(?([0-9]{2})\)?[-. ]?([0-9]{2})[-. ]?([0-9]{5})$", ErrorMessage = "El formato telefono ingresado no es válido.")]
+        [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "El formato telefono ingresado no es válido.")]
         public string PhoneNumber { get; set; }
 
         [Required(ErrorMessage = "El campo correo electrónico es obligatorio.")]
@@ -31,7 +31,7 @@ namespace SalesSystem.Areas.Users.Models
         [StringLength(100, ErrorMessage = "El número de caracteres de {0} debe ser al menos {2}.", MinimumLength = 6)]
         public string Password { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Seleccione un role.")]
         public string Role { get; set; }
     }
 }
