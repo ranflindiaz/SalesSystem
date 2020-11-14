@@ -36,6 +36,11 @@ input[type="file"]{
     max-width: 80%;
 }
 
+.imageUsers {
+    max-width: 100%;
+    height: 90px;
+}
+
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
