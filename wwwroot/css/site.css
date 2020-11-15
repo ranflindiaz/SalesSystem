@@ -41,10 +41,14 @@ input[type="file"]{
     height: 90px;
 }
 
+.imageUserDetails {
+    max-width: 70%;
+
+}
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 @media (min-width: 768px) {
   html {
