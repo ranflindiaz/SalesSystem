@@ -1,15 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SalesSystem.Areas.Users.Models
 {
     public class InputModelRegister
     {
-        [Required(ErrorMessage ="El campo nombre es obligatorio.")]
+        [Required(ErrorMessage = "El campo nombre es obligatorio.")]
         public string Name { get; set; }
 
         [Required(ErrorMessage = "El campo apellido es obligatorio.")]
