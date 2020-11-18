@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using SalesSystem.Areas.Users.Models;
+using SalesSystem.Data;
+using SalesSystem.Library;
 using SalesSystem.Models;
 using System;
 using System.Diagnostics;
@@ -12,16 +14,63 @@ namespace SalesSystem.Controllers
     public class HomeController : Controller
     {
         //IServiceProvider _serviceProvider;
-
-        public HomeController(IServiceProvider serviceProvider)
+        private static InputModelLogin _model;
+        private LUser _user;
+        public HomeController(UserManager<IdentityUser> userManager,
+                     SignInManager<IdentityUser> signInManager,
+                     RoleManager<IdentityRole> roleManager,
+                     ApplicationDbContext context,
+                    IServiceProvider serviceProvider)
         {
             //_serviceProvider = serviceProvider;
+            _user = new LUser(userManager, signInManager, roleManager, context);
         }
 
         public async Task<IActionResult> Index()
         {
             //await CreateRolesAsync(_serviceProvider);
-            return View();
+            if (_model != null)
+            {
+                return View(_model);
+            }
+            else
+            {
+                return View();
+            }
+            
+        }
+        [HttpPost]
+        public async Task<IActionResult> Index(InputModelLogin model)
+        {
+            //await CreateRolesAsync(_serviceProvider);
+            _model = model;
+            if (ModelState.IsValid)
+            {
+                var result = await _user.UserLoginAsync(model);
+                if (result.Succeeded)
+                {
+                    return Redirect("/Principal/Principal");
+                }
+                else
+                {
+                    model.ErrorMessage = "Correo o contraseña invalidos.";
+                    return Redirect("/");
+                }
+                
+            }
+            else
+            {
+                foreach (var modelState in ModelState.Values)
+                {
+                    foreach (var error in modelState.Errors)
+                    {
+                        _model.ErrorMessage = error.ErrorMessage;
+                    }
+
+                }
+                return Redirect("/");
+            }
+           
         }
 
         public IActionResult Privacy()
@@ -38,7 +87,7 @@ namespace SalesSystem.Controllers
         private async Task CreateRolesAsync(IServiceProvider serviceProvider)
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            String[]  rolesName = { "Admin", "User"};
+            String[] rolesName = { "Admin", "User" };
             foreach (var item in rolesName)
             {
                 var roleExist = await roleManager.RoleExistsAsync(item);

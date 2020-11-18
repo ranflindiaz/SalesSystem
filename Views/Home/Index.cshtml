@@ -1,8 +1,42 @@
-﻿@{
+﻿@model InputModelLogin
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container p-4">
+    <div class="row">
+        <div class="col-md-4 mx-auto">
+            <div class="card text-center">
+                <div class="card-header">
+                    <h3>Login</h3>
+                </div>
+                <div>
+                    <img src="~/images/Logo.jpg" class="mx-auto w-50"/>
+                </div>
+                <div class="card-body">
+                    <form asp-controller="Home" asp-action="Index" method="post">
+                        <div class="form-group">
+                            <input asp-for="Email" placeholder="Email" class="form-control" autofocus/>
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <input asp-for="Password" placeholder="Password" class="form-control" autofocus/>
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <span class="text-danger">
+                                @Html.DisplayFor(m => m.ErrorMessage)
+                            </span>
+                        </div>
+                        <button class="btn btn-primary btn-block">
+                            SignIn
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial"/>
+}

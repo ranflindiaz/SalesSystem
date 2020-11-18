@@ -1,7 +1,17 @@
 ﻿@page "/Users/Register"
 @model RegisterModel
 @{
-    var image = "/images/images/default.png";
+    var image = "";
+    if (Model.Input.Image != null)
+    {
+        image = "data:image/jpg;base64," + Convert.ToBase64String(Model.Input.Image, 0,
+            Model.Input.Image.Length);
+    }
+    else
+    {
+        image = "/images/images/default.png";
+    }
+
 }
 
 <div class="container p-4">
@@ -62,14 +72,30 @@
                                             <input asp-for="Input.Email" placeholder="Email" class="form-control" />
                                             <span asp-validation-for="Input.Email" class="text-danger"></span>
                                         </div>
-                                        <div class="form-group">
-                                            <input asp-for="Input.Password" placeholder="Password" class="form-control" />
-                                            <span asp-validation-for="Input.Password" class="text-danger"></span>
-                                        </div>
-                                        <div class="form-group">
-                                             @Html.DropDownList("Input.Role", new SelectList(Model.Input.rolesLista, "Text", "Text"), "Seleccione un role", new { @class = "form-control" })
-                                            <span asp-validation-for="Input.Role" class="text-danger"></span>
-                                        </div>
+
+                                        @if (Model.Input.Id.Equals(0))
+                                        {
+                                            <div class="form-group">
+                                                <input asp-for="Input.Password" placeholder="Password" class="form-control" />
+                                                <span asp-validation-for="Input.Password" class="text-danger"></span>
+                                            </div>
+                                        }
+
+                                        
+                                    <div class="form-group">
+                                        @if (!Model.Input.Id.Equals(0))
+                                        {
+                                            @Html.DropDownList("Input.Role", new SelectList
+                                     (Model.Input.rolesLista, "Text", "Text"), new { @class = "form-control" })
+                                        }
+                                        else
+                                        {
+                                            @Html.DropDownList("Input.Role", new SelectList
+                                     (Model.Input.rolesLista, "Text", "Text"), "Seleccione un role", new { @class = "form-control" })
+                                        }
+
+                                        <span asp-validation-for="Input.Role" class="text-danger"></span>
+                                    </div>
                                         <div class="form-group">
                                             <button type="submit" class="btn btn-primary btn-block">Register</button>
                                         </div>

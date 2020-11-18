@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -10,9 +5,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using SalesSystem.Areas.Users.Models;
 using SalesSystem.Data;
 using SalesSystem.Library;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SalesSystem.Areas.Users.Pages.Account
 {
@@ -25,6 +25,7 @@ namespace SalesSystem.Areas.Users.Pages.Account
         private LUsersRoles _usersRole;
         private static InputModel _dataInput;
         private Uploadimage _uploadimage;
+        private static InputModelRegister _dataUser1, _dataUser2;
         private IWebHostEnvironment _enviroment;
 
 
@@ -44,13 +45,47 @@ namespace SalesSystem.Areas.Users.Pages.Account
             _uploadimage = new Uploadimage();
         }
 
-        public void OnGet()
+        public void OnGet(int id)
         {
-            if (_dataInput != null)
+            if (id.Equals(0))
             {
-                Input = _dataInput;
-                Input.rolesLista = _usersRole.getRoles(_roleManager);
-                Input.AvatarImage = null;
+                _dataUser2 = null;
+            }
+            if (_dataInput != null || _dataUser1 != null || _dataUser2 != null)
+            {
+                if (_dataInput != null)
+                {
+                    Input = _dataInput;
+                    Input.rolesLista = _usersRole.getRoles(_roleManager);
+                    Input.AvatarImage = null;
+                }
+                else
+                {
+                    if (_dataUser1 != null || _dataUser2 != null)
+                    {
+                        if (_dataUser2 != null)
+                            _dataUser1 = _dataUser2;
+                        Input = new InputModel
+                        {
+                            Id = _dataUser1.Id,
+                            Name = _dataUser1.Name,
+                            LastName = _dataUser1.LastName,
+                            NID = _dataUser1.NID,
+                            Email = _dataUser1.Email,
+                            Image = _dataUser1.Image,
+                            PhoneNumber = _dataUser1.IdentityUser.PhoneNumber,
+                            rolesLista = getRoles(_dataUser1.Role)
+
+                        };
+                        if (_dataInput != null)
+                        {
+                            Input.ErrorMessage = _dataInput.ErrorMessage;
+                        }
+
+
+                    }
+                }
+
             }
             else
             {
@@ -60,7 +95,9 @@ namespace SalesSystem.Areas.Users.Pages.Account
                 };
             }
 
-            
+            _dataUser2 = _dataUser1;
+            _dataUser1 = null;
+
         }
 
 
@@ -69,22 +106,49 @@ namespace SalesSystem.Areas.Users.Pages.Account
         public class InputModel : InputModelRegister
         {
             public IFormFile AvatarImage { get; set; }
-            [TempData]
-            public string ErrorMessage { get; set; }
+
+            //[TempData]
+            //public string ErrorMessage { get; set; }
 
             public List<SelectListItem> rolesLista { get; set; }
         }
-        
-        public async Task<IActionResult> OnPost()
+
+        public async Task<IActionResult> OnPost(String dataUser)
         {
-            if (await SaveAsync())
+            if (dataUser == null)
             {
-                return Redirect("/Users/Users/?area=Users");
+                if (_dataUser2 == null)
+                {
+                    if (await SaveAsync())
+                    {
+                        return Redirect("/Users/Users/?area=Users");
+                    }
+                    else
+                    {
+                        return Redirect("/Users/Register");
+                    }
+                }
+                else
+                {
+                    if (await UpdateAsync())
+                    {
+                        var url = $"/Users/Account/Details?id={_dataUser2.Id}";
+                        _dataUser2 = null;
+                        return Redirect(url);
+                    }
+                    else
+                    {
+                        return Redirect("/Users/Register");
+                    }
+                }
+
             }
             else
             {
-                return Redirect("/Users/Register");
+                _dataUser1 = JsonConvert.DeserializeObject<InputModelRegister>(dataUser);
+                return Redirect("/Users/Register?id=1");
             }
+
         }
 
         private async Task<bool> SaveAsync()
@@ -169,6 +233,87 @@ namespace SalesSystem.Areas.Users.Pages.Account
                 valor = false;
             }
 
+            return valor;
+        }
+
+        private List<SelectListItem> getRoles(String role)
+        {
+            List<SelectListItem> rolesLista = new List<SelectListItem>();
+            rolesLista.Add(new SelectListItem
+            {
+                Text = role
+            });
+            var roles = _usersRole.getRoles(_roleManager);
+            roles.ForEach(item =>
+            {
+                if (item.Text != role)
+                {
+                    rolesLista.Add(new SelectListItem
+                    {
+                        Text = item.Text
+                    });
+                }
+            });
+
+            return rolesLista;
+        }
+
+        private async Task<bool> UpdateAsync()
+        {
+            var valor = false;
+            byte[] imageByte = null;
+            var strategy = _context.Database.CreateExecutionStrategy();
+            await strategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = _context.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        var identityUser = _userManager.Users.Where(u => u.Id.Equals(_dataUser2.ID)).ToList().Last();
+                        identityUser.UserName = Input.Email;
+                        identityUser.Email = Input.Email;
+                        identityUser.PhoneNumber = Input.PhoneNumber;
+                        _context.Update(identityUser);
+                        await _context.SaveChangesAsync();
+
+                        if (Input.AvatarImage == null)
+                        {
+                            imageByte = _dataUser2.Image;
+                        }
+                        else
+                        {
+                            imageByte = await _uploadimage.ByteAvatarImageAsync(Input.AvatarImage, _enviroment, "");
+                        }
+                        var t_user = new TUsers()
+                        {
+                            ID = _dataUser2.Id,
+                            Name = Input.Name,
+                            LastName = Input.LastName,
+                            NID = Input.NID,
+                            Email = Input.Email,
+                            IdUser = _dataUser2.ID,
+                            Image = imageByte
+                        };
+                        _context.Update(t_user);
+                        _context.SaveChanges();
+
+                        if (_dataUser2.Role != Input.Role)
+                        {
+                            await _userManager.RemoveFromRoleAsync(identityUser, _dataUser2.Role);
+                            await _userManager.AddToRoleAsync(identityUser, Input.Role);
+                        }
+                        transaction.Commit();
+                        valor = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        _dataInput.ErrorMessage = ex.Message;
+                        transaction.Rollback();
+                        valor = false;
+
+                    }
+                }
+            });
             return valor;
         }
     }

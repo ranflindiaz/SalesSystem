@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using SalesSystem.Data;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,7 +19,7 @@ namespace SalesSystem.Library
                     Value = item.Id,
                     Text = item.Name
                 });
-                
+
             });
             return _selectList;
         }
