@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SalesSystem.Areas.Users.Models;
+using SalesSystem.Controllers;
 using SalesSystem.Data;
 using SalesSystem.Library;
 using SalesSystem.Models;
@@ -12,6 +14,7 @@ using SalesSystem.Models;
 namespace SalesSystem.Areas.Users.Controllers
 {
     [Area("Users")]
+    [Authorize]
     public class UsersController : Controller
     {
         private SignInManager<IdentityUser> _signInManager;
@@ -29,8 +32,8 @@ namespace SalesSystem.Areas.Users.Controllers
 
         public IActionResult Users(int id, String filtrar, int registros)
         {
-            //if (_signInManager.IsSignedIn(User))
-            //{
+            if (_signInManager.IsSignedIn(User))
+            {
                 Object[] objects = new Object[3];
                 var data = _user.getTUsuariosAsync(filtrar, 0);
                 if (0 < data.Result.Count)
@@ -54,12 +57,18 @@ namespace SalesSystem.Areas.Users.Controllers
                     Input = new InputModelRegister()
                 };
                 return View(models);
-            //}
-            //else
-            //{
-            //    return Redirect("/");
-            //}
+            }   
+            else
+            {
+                return Redirect("/");
+            }       
 
+        }
+
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction(nameof(HomeController.Index), "Home");
         }
     }
 }
