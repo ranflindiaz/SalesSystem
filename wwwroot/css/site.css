@@ -43,7 +43,18 @@ input[type="file"]{
 
 .imageUserDetails {
     max-width: 70%;
+}
 
+.imglogo {
+    max-width: 100%;
+}
+
+.navbar-brand {
+    max-width: 50%;
+}
+
+.border-bottom {
+    border-bottom: 3px solid #d6d5d5 !important;
 }
 /* Sticky footer styles
 -------------------------------------------------- */
@@ -53,6 +64,9 @@ html {
 @media (min-width: 768px) {
   html {
     font-size: 16px;
+  }
+  .navbar-brand {
+      max-width: 15%;
   }
 }
 

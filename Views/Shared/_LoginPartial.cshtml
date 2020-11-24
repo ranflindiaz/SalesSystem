@@ -1,12 +1,24 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
+@inject ApplicationDbContext Context
 
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
 {
+    var name = "";
+    var id = UserManager.GetUserId(User);
+    var user = Context.TUsers.Where(u => u.IdUser.Equals(id)).ToList();
+    if (user.Count.Equals(0))
+    {
+        name = "Express";
+    }
+    else
+    {
+        name = $"{user[0].Name} {user[0].LastName}";
+    }
     <li class="nav-item">
-        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity.Name!</a>
+        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @name!</a>
     </li>
     <li class="nav-item">
         <form  class="form-inline" asp-area="Users" asp-controller="Users" asp-action="Logout">
