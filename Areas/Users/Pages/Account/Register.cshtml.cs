@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -16,6 +17,8 @@ using System.Threading.Tasks;
 
 namespace SalesSystem.Areas.Users.Pages.Account
 {
+    [Authorize]
+    [Area("Users")]
     public class RegisterModel : PageModel
     {
         private SignInManager<IdentityUser> _singInManager;
@@ -47,6 +50,7 @@ namespace SalesSystem.Areas.Users.Pages.Account
 
         public void OnGet(int id)
         {
+            _dataUser2 = null;
             if (id.Equals(0))
             {
                 _dataUser2 = null;
@@ -113,33 +117,50 @@ namespace SalesSystem.Areas.Users.Pages.Account
             public List<SelectListItem> rolesLista { get; set; }
         }
 
+
         public async Task<IActionResult> OnPost(String dataUser)
         {
             if (dataUser == null)
             {
                 if (_dataUser2 == null)
                 {
-                    if (await SaveAsync())
+                    if (User.IsInRole("Admin"))
+                    {
+                        if (await SaveAsync())
+                        {
+                            return Redirect("/Users/Users/?area=Users");
+                        }
+                        else
+                        {
+                            return Redirect("/Users/Register");
+                        }
+                    }
+                    else
                     {
                         return Redirect("/Users/Users/?area=Users");
                     }
-                    else
-                    {
-                        return Redirect("/Users/Register");
-                    }
+                        
                 }
                 else
                 {
-                    if (await UpdateAsync())
+                    if (User.IsInRole("Admin"))
                     {
-                        var url = $"/Users/Account/Details?id={_dataUser2.Id}";
-                        _dataUser2 = null;
-                        return Redirect(url);
+                        if (await UpdateAsync())
+                        {
+                            var url = $"/Users/Account/Details?id={_dataUser2.Id}";
+                            _dataUser2 = null;
+                            return Redirect(url);
+                        }
+                        else
+                        {
+                            return Redirect("/Users/Register");
+                        }
                     }
                     else
                     {
-                        return Redirect("/Users/Register");
+                        return Redirect("/Users/Users/?area=Users");
                     }
+                    
                 }
 
             }
@@ -258,6 +279,7 @@ namespace SalesSystem.Areas.Users.Pages.Account
             return rolesLista;
         }
 
+        
         private async Task<bool> UpdateAsync()
         {
             var valor = false;

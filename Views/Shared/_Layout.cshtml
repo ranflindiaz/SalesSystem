@@ -32,11 +32,21 @@
                             </li>
                             <li class="nav-item dropdown">
                                 <a class=" nav-link dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true"
+                                   aria-expanded="false" href="#">Clientes</a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" asp-area="Customers" asp-controller="Customers"
+                                       asp-action="Customers">Lista de Clientes</a>
+                                    <a class="dropdown-item" asp-route-id="0" asp-area="Customers"
+                                       asp-page="/Account/Register">Agregar</a>
+                                </div>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class=" nav-link dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true"
                                    aria-expanded="false" href="#">Usuario</a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" asp-area="Users" asp-controller="Users"
                                        asp-action="Users">Lista de Usuarios</a>
-                                    <a class="dropdown-item" asp-route-id="0" asp-area="Users" 
+                                    <a class="dropdown-item" asp-route-id="0" asp-area="Users"
                                        asp-page="/Account/Register">Agregar</a>
                                 </div>
                             </li>
