@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <Folder Include="Areas\Customers\Data\" />
-    <Folder Include="Areas\Customers\Models\" />
     <Folder Include="Areas\Principal\Controllers\" />
     <Folder Include="Areas\Principal\Data\" />
     <Folder Include="Areas\Principal\Models\" />
