@@ -11,6 +11,7 @@ namespace SalesSystem.Areas.Users.Models
         public string Name { get; set; }
         public string LastName { get; set; }
         public string NID { get; set; }
+        public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string IdUser { get; set; }
         public byte[] Image { get; set; }

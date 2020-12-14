@@ -205,6 +205,7 @@ namespace SalesSystem.Areas.Users.Pages.Account
                                         Name = Input.Name,
                                         LastName = Input.LastName,
                                         NID = Input.NID,
+                                        PhoneNumber = Input.PhoneNumber,
                                         Email = Input.Email,
                                         IdUser = dataUser.Id,
                                         Image = imageByte,
@@ -312,6 +313,7 @@ namespace SalesSystem.Areas.Users.Pages.Account
                             Name = Input.Name,
                             LastName = Input.LastName,
                             NID = Input.NID,
+                            PhoneNumber = Input.PhoneNumber,
                             Email = Input.Email,
                             IdUser = _dataUser2.ID,
                             Image = imageByte

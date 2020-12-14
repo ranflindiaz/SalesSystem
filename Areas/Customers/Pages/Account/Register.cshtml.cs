@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using SalesSystem.Areas.Customers.Models;
 using SalesSystem.Data;
 using SalesSystem.Library;
@@ -27,6 +28,7 @@ namespace SalesSystem.Areas.Customers.Pages.Account
         private Uploadimage _uploadImage;
         private static InputModelRegister _dataClient1, _dataClient2;
         private IWebHostEnvironment _environment;
+        private LCustomers _customer;
 
         public RegisterModel(
                             UserManager<IdentityUser> userManager,
@@ -41,13 +43,61 @@ namespace SalesSystem.Areas.Customers.Pages.Account
             _context = context;
             _environment = environment;
             _uploadImage = new Uploadimage();
+            _customer = new LCustomers(context);
         }
-        public void OnGet()
+        public void OnGet(int id)
         {
-            Input = new InputModel
+            _dataClient2 = null;
+            if (id.Equals(0))
             {
+                _dataClient2 = null;
+                _dataInput = null;
+            }
+            if (_dataInput != null || _dataClient1 != null || _dataClient2 != null)
+            {
+                if (_dataInput != null)
+                {
+                    Input = _dataInput;
+                    Input.AvatarImage = null;
+                    Input.Image = _dataClient2.Image;
+                }
+                else
+                {
+                    if (_dataClient1 != null || _dataClient2 != null)
+                    {
+                        if (_dataClient2 != null)
+                            _dataClient1 = _dataClient2;
+                        Input = new InputModel
+                        {
+                            Name = _dataClient1.Name,
+                            LastName = _dataClient1.LastName,
+                            Nid = _dataClient1.Nid,
+                            Email = _dataClient1.Email,
+                            Image = _dataClient1.Image,
+                            Phone = _dataClient1.Phone,
+                            Direction = _dataClient1.Direction,
+                            Credit = _dataClient1.Credit
+                        };
+                        if (_dataInput != null)
+                        {
+                            Input.ErrorMessage = _dataInput.ErrorMessage;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Input = new InputModel
+                {
 
-            };
+                };
+            }
+            if (_dataClient2 == null)
+            {
+                _dataClient2 = _dataClient1;
+            }
+            _dataClient1 = null;
+            
         }
         [BindProperty]
         public InputModel Input { get; set; }
@@ -56,14 +106,14 @@ namespace SalesSystem.Areas.Customers.Pages.Account
             public IFormFile AvatarImage { get; set; }
 
         }
-        public async Task<IActionResult> OnPost(String dataClient)
+        public async Task<IActionResult> OnPost(String DataClient)
         {
-            if (dataClient == null)
+            if (DataClient == null)
             {
                 if (_dataClient2 == null)
                 {
-                    if (User.IsInRole("Admin"))
-                    {
+                    //if (User.IsInRole("Admin"))
+                    //{
                         if (await SaveAsync())
                         {
                             return Redirect("/Customers/Customers?area=Customers");
@@ -72,19 +122,39 @@ namespace SalesSystem.Areas.Customers.Pages.Account
                         {
                             return Redirect("/Customers/Register");
                         }
-                    }
-                    else
-                    {
-                        return Redirect("/Customers/Customers?area=Customers");
-                    }
+                    //}
+                    //else
+                    //{
+                    //    return Redirect("/Customers/Customers?area=Customers");
+                    //}
                 }
                 else
                 {
-                    return null;
+                    //if (User.IsInRole("Admin"))
+                    //{
+                        if (await UpdateAsync())
+                        {
+                            var url = $"/Customers/Account/Details?id={_dataClient2.IdClient}";
+                            _dataInput = null;
+                            _dataClient1 = null;
+                            _dataClient2 = null; 
+                        return Redirect(url);
+                        }
+                        else
+                        {
+                        return Redirect("/Customers/Register?id=1");
+                        }
+                    //}
+                    //else
+                    //{
+                    //    return Redirect("/Customers/Customers?area=Customers");
+                    //}
+
                 }
             }
             else
             {
+                _dataClient1 = JsonConvert.DeserializeObject<InputModelRegister>(DataClient);
                 return Redirect("/Customers/Register?id=1");
             }
         }
@@ -162,6 +232,64 @@ namespace SalesSystem.Areas.Customers.Pages.Account
                 }
                 valor = false;
             }
+            return valor;
+        }
+
+        public async Task<bool> UpdateAsync()
+        {
+            _dataInput = Input;
+            var valor = false;
+            byte[] imageByte = null;
+            var strategy = _context.Database.CreateExecutionStrategy();
+            await strategy.ExecuteAsync(async () => { 
+                using (var transaction = _context.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        var clientData = _customer.getTClient(Input.Nid);
+                        if (clientData.Count.Equals(0) || clientData[0].IdClient.Equals(_dataClient2.IdClient))
+                        {
+                            if (Input.AvatarImage == null)
+                            {
+                                imageByte = _dataClient2.Image;
+                            }
+                            else
+                            {
+                                imageByte = await _uploadImage.ByteAvatarImageAsync(Input.AvatarImage, _environment, "");
+                            }
+                            var client = new TClients
+                            {
+                                IdClient = _dataClient2.IdClient,
+                                Nid = Input.Nid,
+                                Name = Input.Name,
+                                LastName = Input.LastName,
+                                Email = Input.Email,
+                                Phone = Input.Phone,
+                                Credit = Input.Credit,
+                                Direction = Input.Direction,
+                                Image = imageByte
+                            };
+                            _context.Update(client);
+                            _context.SaveChanges();
+                            transaction.Commit();
+
+                            valor = true;
+                        }
+                        else
+                        {
+                            _dataInput.ErrorMessage = $"El {Input.Nid} ya esta registrado";
+                            valor = false;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+
+                        _dataInput.ErrorMessage = ex.Message;
+                        transaction.Rollback();
+                        valor = false;
+                    }
+                }
+            });
             return valor;
         }
     }

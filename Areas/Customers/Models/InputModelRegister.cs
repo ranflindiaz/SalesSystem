@@ -29,6 +29,7 @@ namespace SalesSystem.Areas.Customers.Models
         public DateTime Date { get; set; }
         public bool Credit { get; set; }
         public byte[] Image { get; set; }
+        public int IdClient { get; set; }
 
         [TempData]
         public string ErrorMessage { get; set; }

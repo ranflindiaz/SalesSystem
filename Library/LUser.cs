@@ -60,6 +60,7 @@ namespace SalesSystem.Library
                         NID = item.NID,
                         Name = item.Name,
                         LastName = item.LastName,
+                        PhoneNumber = item.PhoneNumber,
                         Email = item.Email,
                         Role = _listRoles[0].Text,
                         Image = item.Image,
