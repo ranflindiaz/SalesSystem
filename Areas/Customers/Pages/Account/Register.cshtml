@@ -3,7 +3,8 @@
 @{
 
     var image = "";
-    //var EtiquetaH3 = "";
+    var EtiquetaH3 = "";
+    var btnRegistrar = "";
     if (Model.Input.Image != null)
     {
         image = "data:image/jpg;base64," + Convert.ToBase64String(Model.Input.Image, 0,
@@ -13,14 +14,16 @@
     {
         image = "/images/images/default.png";
     }
-    //if (Model.Input.IdClient.Equals(0))
-    //{
-    //    EtiquetaH3 = "Registrar Cliente";
-    //}
-    //else
-    //{
-    //    EtiquetaH3 = "Actualizar Cliente";
-    //}
+    if (Model.Input.Name == null)
+    {
+        EtiquetaH3 = "Registrar Cliente";
+        btnRegistrar = "Registrar";
+    }
+    else
+    {
+        EtiquetaH3 = "Actualizar Cliente";
+        btnRegistrar = "Actualizar";
+    }
 }
 
     <div class="container p-4">
@@ -30,7 +33,7 @@
                     <div class="card text-center">
                         <div class="card-header">
                             <output id="imageCustomer">
-                                <img src="@image" class="imageUserDetails" />
+                                <img src="@image" class="imageUser" />
                             </output>
                         </div>
                         <div class="card-body">
@@ -44,7 +47,7 @@
                 <div class="col-xs-6 col-md-5">
                     <div class="panel panel-primary">
                         <div class="panel-heading">
-                            <h3 class="panel-title">Registrar Cliente</h3>
+                            <h3 class="panel-title">@EtiquetaH3</h3>
                         </div>
                         <div class="panel-body">
                             <div class="accordion" id="accordionExample">
@@ -94,7 +97,7 @@
                                                 <label asp-for="Input.Credit" class="col-md-10 control-label">Credito</label>
                                             </div>
                                             <div class="form-group">
-                                                <button type="submit" class="btn btn-primary btn-block">Register</button>
+                                                <button type="submit" class="btn btn-primary btn-block">@btnRegistrar</button>
                                             </div>
                                             <div class="form-group">
                                                 <label class="text-danger">@Html.DisplayFor(m => m.Input.ErrorMessage)</label>

@@ -139,7 +139,7 @@ namespace SalesSystem.Areas.Users.Pages.Account
                     {
                         return Redirect("/Users/Users/?area=Users");
                     }
-                        
+
                 }
                 else
                 {
@@ -160,7 +160,7 @@ namespace SalesSystem.Areas.Users.Pages.Account
                     {
                         return Redirect("/Users/Users/?area=Users");
                     }
-                    
+
                 }
 
             }

@@ -14,7 +14,7 @@ namespace SalesSystem.Controllers
 {
     public class HomeController : Controller
     {
-        //IServiceProvider _serviceProvider;
+        IServiceProvider _serviceProvider;
         private static InputModelLogin _model;
         private LUser _user;
         private SignInManager<IdentityUser> _signInManager;
@@ -24,14 +24,14 @@ namespace SalesSystem.Controllers
                      ApplicationDbContext context,
                     IServiceProvider serviceProvider)
         {
-            //_serviceProvider = serviceProvider;
+            _serviceProvider = serviceProvider;
             _signInManager = signInManager;
             _user = new LUser(userManager, signInManager, roleManager, context);
         }
 
         public async Task<IActionResult> Index()
         {
-            //await CreateRolesAsync(_serviceProvider);
+            await CreateRolesAsync(_serviceProvider);
             if (_signInManager.IsSignedIn(User))
             {
                 return RedirectToAction(nameof(PrincipalController.Principal), "Principal");
@@ -51,14 +51,14 @@ namespace SalesSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> Index(InputModelLogin model)
         {
-            //await CreateRolesAsync(_serviceProvider);
+            await CreateRolesAsync(_serviceProvider);
             _model = model;
             if (ModelState.IsValid)
             {
                 var result = await _user.UserLoginAsync(model);
                 if (result.Succeeded)
                 {
-                    return Redirect("/Principal/Principal");
+                   return Redirect("/Principal/Principal");
                 }
                 else
                 {

@@ -38,7 +38,7 @@ namespace SalesSystem.Data.Migrations
                     Monthly = table.Column<decimal>(nullable: false),
                     Change = table.Column<decimal>(nullable: false),
                     LastPayment = table.Column<decimal>(nullable: false),
-                    DatePayment = table.Column<decimal>(nullable: false),
+                    DatePayment = table.Column<DateTime>(nullable: false),
                     CurrentDebt = table.Column<decimal>(nullable: false),
                     DateDebt = table.Column<DateTime>(nullable: false),
                     Ticket = table.Column<string>(nullable: true),

@@ -272,8 +272,8 @@ namespace SalesSystem.Data.Migrations
                     b.Property<DateTime>("DateDebt")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("DatePayment")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<DateTime>("DatePayment")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("Deadline")
                         .HasColumnType("datetime2");

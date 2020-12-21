@@ -112,8 +112,8 @@ namespace SalesSystem.Areas.Customers.Pages.Account
             {
                 if (_dataClient2 == null)
                 {
-                    //if (User.IsInRole("Admin"))
-                    //{
+                    if (User.IsInRole("Admin"))
+                    {
                         if (await SaveAsync())
                         {
                             return Redirect("/Customers/Customers?area=Customers");
@@ -122,16 +122,16 @@ namespace SalesSystem.Areas.Customers.Pages.Account
                         {
                             return Redirect("/Customers/Register");
                         }
-                    //}
-                    //else
-                    //{
-                    //    return Redirect("/Customers/Customers?area=Customers");
-                    //}
+                    }
+                    else
+                    {
+                        return Redirect("/Customers/Customers?area=Customers");
+                    }
                 }
                 else
                 {
-                    //if (User.IsInRole("Admin"))
-                    //{
+                    if (User.IsInRole("Admin"))
+                    {
                         if (await UpdateAsync())
                         {
                             var url = $"/Customers/Account/Details?id={_dataClient2.IdClient}";
@@ -144,12 +144,11 @@ namespace SalesSystem.Areas.Customers.Pages.Account
                         {
                         return Redirect("/Customers/Register?id=1");
                         }
-                    //}
-                    //else
-                    //{
-                    //    return Redirect("/Customers/Customers?area=Customers");
-                    //}
-
+                    }
+                    else
+                    {
+                        return Redirect("/Customers/Customers?area=Customers");
+                    }
                 }
             }
             else
